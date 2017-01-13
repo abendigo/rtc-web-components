@@ -1,5 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 
+<script src="../webrtc-adapter/release/adapter.js"></script>
+
 <dom-module id='rtc-media-stream'>
     <!--<template>
         <h1>rtc-media-stream</h1>
@@ -39,7 +41,7 @@
             connectedCallback() {
                 super.connectedCallback();
 
-                // console.log('asdasdasdada', this.instigator, this.parentNode._pc);
+                console.log('RtcMediaStream', this.instigator, this.parentNode._pc);
                 this._pc = this.parentNode._pc;
                 // if (this.instigator) {
                 //     // create data channel and setup chat
@@ -64,7 +66,7 @@
                     //     var channel = evt.channel;
                     //     this.setupChat(channel);
                     // };
-                    this._pc.onaddstream = e => {
+                    this.parentNode._pc.onaddstream = e => {
                         console.log('-==-=-=-=-==--= anAddStream', this.parentNode.id, e)
                         // this.$.video.srcObject = e.stream;
                         this.out = e.stream;
@@ -73,8 +75,8 @@
             }
 
             _inChanged(newValue, oldValue) {
-                console.log('_inChanged', newValue, oldValue);
-                this._pc.addStream(newValue);
+                console.log('_inChanged', this.parentNode);
+                this.parentNode._pc.addStream(newValue);
             }
         }
 

@@ -14,6 +14,7 @@
                 super();
 
                 console.log(`RtcPeerConnection.constructor`);
+                this.createPeerConnection();
             }
 
             static get is() {
@@ -27,6 +28,7 @@
                         //     type: Boolean,
                         //     default: false
                         // },
+                        iam: String,
                         message: Object,
                         peer: String,
                         signaling: {
@@ -39,11 +41,11 @@
             connectedCallback() {
                 super.connectedCallback();
 
-                // console.log(`RtcPeerConnection.connectedCallback`, this, this.peer, this.message, this.signaling);
-                this.signaling.connect(this.id, this);
+                console.log(`RtcPeerConnection.connectedCallback`, this, this.peer, this.message, this.signaling);
+                this.signaling.connect(this.iam, this);
+            }
 
-
-
+createPeerConnection() {
 
         // let isInstigator = true;
         //   console.log('createPeerConnection', this.peer, isInstigator)
@@ -56,7 +58,7 @@
 
         // send any ice candidates to the other peer
         this._pc.onicecandidate = evt => {
-            this.signaling.send({to: this.peer, from: this.id}, { "candidate": evt.candidate });
+            this.signaling.send({to: this.peer, from: this.iam}, { "candidate": evt.candidate });
         };
 
         // let the "negotiationneeded" event trigger offer generation
@@ -66,7 +68,7 @@
             })
             .then(_ => {
                 // send the offer to the other peer
-                this.signaling.send({to: this.peer, from: this.id}, { "desc": this._pc.localDescription });
+                this.signaling.send({to: this.peer, from: this.iam}, { "desc": this._pc.localDescription });
             })
             .catch(this.logError);
         };
@@ -117,6 +119,7 @@
                 super.disconnectedCallback();
 
                 console.log(`RtcPeerConnection.disconnectedCallback`);
+                this._pc.close();
             }
 
 
@@ -173,7 +176,7 @@
                     return this._pc.setLocalDescription(answer);
                 })
                 .then(_ => {
-                    this.signaling.send({to: this.peer, from: this.id}, { "desc": this._pc.localDescription });
+                    this.signaling.send({to: this.peer, from: this.iam}, { "desc": this._pc.localDescription });
                 })
                 .catch(this.logError);
             } else {
