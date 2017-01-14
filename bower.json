@@ -6,12 +6,20 @@
     "rtc-media-stream.html",
     "rtc-peer-connection.html"
   ],
-  "moduleType": "",
   "license": "MIT",
-  "keywords": ["polymer", "web-rtc", "web-components"],
+  "keywords": [
+    "polymer",
+    "web-components",
+    "WebRTC",
+    "PeerConnection",
+    "RTCPeerConnection"
+  ],
   "authors": "Mark Oostervled <mark@oosterveld.org> (https://abendigo.gihub.io)",
   "homepage": "",
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/abendigo/rtc-web-components.git"
+  },
   "dependencies": {
     "polymer": "Polymer/polymer#2.0-preview",
     "webrtc-adapter": "^2.1.0"
