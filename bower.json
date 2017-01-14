@@ -1,5 +1,17 @@
 {
   "name": "rtc-web-components",
+  "description": "A collection of elements for WebRTC.",
+  "main": [
+    "rtc-data-channel.html",
+    "rtc-media-stream.html",
+    "rtc-peer-connection.html"
+  ],
+  "moduleType": "",
+  "license": "MIT",
+  "keywords": ["polymer", "web-rtc", "web-components"],
+  "authors": "Mark Oostervled <mark@oosterveld.org> (https://abendigo.gihub.io)",
+  "homepage": "",
+  "repository": "",
   "dependencies": {
     "polymer": "Polymer/polymer#2.0-preview",
     "webrtc-adapter": "^2.1.0"
