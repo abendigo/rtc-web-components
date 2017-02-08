@@ -1,11 +1,7 @@
 {
   "name": "rtc-web-components",
   "description": "A collection of elements for WebRTC.",
-  "main": [
-    "rtc-data-channel.html",
-    "rtc-media-stream.html",
-    "rtc-peer-connection.html"
-  ],
+  "main": ["all-imports.html"],
   "license": "MIT",
   "keywords": [
     "polymer",
