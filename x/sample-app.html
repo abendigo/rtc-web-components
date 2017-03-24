@@ -1,0 +1,118 @@
+<link rel="import" href="bower_components/polymer/polymer.html" />
+
+<link rel="import" href="custom/socketio-signaling-channel.html" />
+<link rel="import" href="custom/rtc-media-stream.html" />
+<link rel="import" href="custom/rtc-peer-connection.html" />
+
+<dom-module id="sample-app">
+    <template>
+        <style>
+        :host {
+            font-family: sans-serif;
+        }
+
+        video {
+            max-width: 100%;
+            width: 320px;
+        }
+        </style>
+
+        <socketio-signaling-channel id="channel" on-message="onMessage" on-joined="onJoined">
+        </socketio-signaling-channel>
+
+        <dom-if if=[[foobar]] restamp>
+            <template>
+                <h3>PEER CONNECTION</h3>
+                <rtc-peer-connection id="peer" on-send="onSend">
+                    <rtc-media-stream in=[[_localStream]] out={{_remoteStream}}></rtc-media-stream>
+                </rtc-peer-connection>
+            </template>
+        </dom-if>
+
+        <h1>Realtime communication with WebRTC</h1>
+
+        <div id="videos">
+            <video id="localVideo" src-object=[[_localStream]] autoplay muted></video>
+            <video id="remoteVideo" src-object=[[_remoteStream]] autoplay></video>
+        </div>
+    </template>
+
+    <script>
+        class SampleApp extends Polymer.Element {
+            static get is() {
+                return "sample-app";
+            }
+
+            static get observers() {
+                return ['_xyzzy(foobar, _localStream)'];
+            }
+
+            // constructor() {
+            //     super();
+            // }
+
+            connectedCallback() {
+                super.connectedCallback();
+
+                navigator.mediaDevices.getUserMedia({
+                    audio: false,
+                    video: true
+                }).then(stream => {
+                    this._localStream = stream;
+// console.log('========', this.foobar)
+//                     this._signalingChannel.send('got user media');
+                }).catch(function(e) {
+                    alert('getUserMedia() error: ' + e.name);
+                });
+            }
+
+            // disconnectedCallback() {
+            //     super.disconnectedCallback();
+            // }
+
+            // attributeChangedCallback() {
+            //     super.attributeChangedCallback();
+            // }
+
+            _xyzzy(foobar, localStream) {
+                console.log('_xyzzy', foobar, localStream)
+                if (foobar && localStream) {
+                    this.$.channel.send('got user media');
+                }
+            }
+
+            onSend(e) {
+                console.log('onSend', e);
+
+                this.$.channel.send(e.detail);
+            }
+
+            onMessage(e) {
+                console.log('onMessage', e.detail);
+                if (e.detail === 'got user media') {
+                    this.foobar = "waz here";
+                    // maybeStart();
+                } else if (e.detail === 'bye' && this.foobar) {
+                    // handleRemoteHangup();
+                    this.foobar = undefined;
+                } else {
+                    Polymer.dom(this.root).querySelector('#peer').onSignal(e.detail);
+                }
+            }
+
+            onJoined(e) {
+                console.log('onJoined', e.detail)
+                this.foobar = "haz catz";
+            }
+
+            // maybeStart() {
+            //     console.log('maybeStart', this.isStarted, this._localStream, this.isChannelReady);
+            //     if (!this.isStarted && typeof this._localStream !== 'undefined' && this.isChannelReady) {
+
+            //     }
+            // }
+        }
+
+        customElements.define(SampleApp.is, SampleApp);
+    </script>
+</dom-module>

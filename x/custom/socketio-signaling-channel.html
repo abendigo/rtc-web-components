@@ -1,0 +1,108 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<!--<link rel="import" href="bower_components/rtc-web-components/rtc-signaling-channel-mixin.html">-->
+<script src="/socket.io/socket.io.js"></script>
+
+<dom-module id='socketio-signaling-channel'>
+    <script>
+        const RtcSignalingChannelMixin = subclass => class extends subclass {
+            // static get config() {
+            //     return {
+            //         properties: {
+            //             instance: {
+            //                 type: Object,
+            //                 notify: true
+            //             },
+            //             users: {
+            //                 type: Object,
+            //                 notify: true,
+            //                 value: {}
+            //             }
+            //         }
+            //     };
+            // }
+
+            connectedCallback() {
+                console.log('RtcSignalingChannelMixin.connectedCallback')
+                super.connectedCallback();
+
+                // this.instance = this;
+            }
+
+            // connect(name) {
+            //     console.log('RtcSignalingChannelMixin.connect')
+            // }
+
+            // send(target, data) {
+            //     console.log('RtcSignalingChannelMixin.send', target, data)
+            // }
+        }
+
+        class SocketIOSignalingChannel extends RtcSignalingChannelMixin(Polymer.Element) {
+            static get is() { return 'socketio-signaling-channel'; }
+
+            connectedCallback() {
+                console.log('SocketIOSignalingChannel.connectedCallback');
+                super.connectedCallback();
+
+                let room = 'foo';
+                let isInitiator;
+                let isChannelReady;
+                let isStarted;
+
+                this.socket = io.connect();
+                if (room !== '') {
+                    this.socket.emit('create or join', room);
+                    console.log('Attempted to create or  join room', room);
+                }
+
+                this.socket.on('created', function(room) {
+                    console.log('Created room ' + room);
+                    isInitiator = true;
+                });
+
+                this.socket.on('full', function(room) {
+                    console.log('Room ' + room + ' is full');
+                });
+
+                this.socket.on('join', (room) => {
+                    console.log('Another peer made a request to join room ' + room, this);
+                    console.log('This peer is the initiator of room ' + room + '!');
+                    this.isChannelReady = true;
+                });
+
+                this.socket.on('joined', (room) => {
+                    console.log('joined: ' + room);
+                    this.isChannelReady = true;
+
+                    this.dispatchEvent(new CustomEvent('joined', {detail: room}));
+                });
+
+                this.socket.on('log', function(array) {
+                    console.log.apply(console, array);
+                });
+
+                // This client receives a message
+                this.socket.on('message', (message) => {
+                    console.log('Client received message:', message);
+                    // this.users[header.to].peer.onSignal(data);
+
+                    this.dispatchEvent(new CustomEvent('message', {detail: message}));
+
+                });
+            }
+
+            connect(name, peer) {
+              console.log('connect', name, peer)
+              this.peer = peer;
+            }
+
+            send(header, data) {
+              console.log('send', header, data)
+              this.socket.emit('message', header);
+            }
+        }
+
+        customElements.define(SocketIOSignalingChannel.is, SocketIOSignalingChannel);
+    </script>
+</dom-module>
