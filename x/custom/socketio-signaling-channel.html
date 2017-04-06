@@ -23,7 +23,7 @@
             // }
 
             connectedCallback() {
-                console.log('RtcSignalingChannelMixin.connectedCallback')
+                // console.log('RtcSignalingChannelMixin.connectedCallback')
                 super.connectedCallback();
 
                 // this.instance = this;
@@ -42,7 +42,7 @@
             static get is() { return 'socketio-signaling-channel'; }
 
             connectedCallback() {
-                console.log('SocketIOSignalingChannel.connectedCallback');
+                // console.log('SocketIOSignalingChannel.connectedCallback');
                 super.connectedCallback();
 
                 let room = 'foo';
@@ -53,38 +53,38 @@
                 this.socket = io.connect();
                 if (room !== '') {
                     this.socket.emit('create or join', room);
-                    console.log('Attempted to create or  join room', room);
+                    // console.log('Attempted to create or  join room', room);
                 }
 
                 this.socket.on('created', function(room) {
-                    console.log('Created room ' + room);
+                    // console.log('Created room ' + room);
                     isInitiator = true;
                 });
 
                 this.socket.on('full', function(room) {
-                    console.log('Room ' + room + ' is full');
+                    // console.log('Room ' + room + ' is full');
                 });
 
                 this.socket.on('join', (room) => {
-                    console.log('Another peer made a request to join room ' + room, this);
-                    console.log('This peer is the initiator of room ' + room + '!');
+                    // console.log('Another peer made a request to join room ' + room, this);
+                    // console.log('This peer is the initiator of room ' + room + '!');
                     this.isChannelReady = true;
                 });
 
                 this.socket.on('joined', (room) => {
-                    console.log('joined: ' + room);
+                    // console.log('joined: ' + room);
                     this.isChannelReady = true;
 
                     this.dispatchEvent(new CustomEvent('joined', {detail: room}));
                 });
 
                 this.socket.on('log', function(array) {
-                    console.log.apply(console, array);
+                    // console.log.apply(console, array);
                 });
 
                 // This client receives a message
                 this.socket.on('message', (message) => {
-                    console.log('Client received message:', message);
+                    console.log('RECV', JSON.stringify(message));
                     // this.users[header.to].peer.onSignal(data);
 
                     this.dispatchEvent(new CustomEvent('message', {detail: message}));
@@ -93,13 +93,13 @@
             }
 
             connect(name, peer) {
-              console.log('connect', name, peer)
+            //   console.log('connect', name, peer)
               this.peer = peer;
             }
 
-            send(header, data) {
-              console.log('send', header, data)
-              this.socket.emit('message', header);
+            send(data) {
+              console.log('SEND', JSON.stringify(data));
+              this.socket.emit('message', data);
             }
         }
 

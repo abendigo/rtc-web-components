@@ -19,31 +19,29 @@
                 return 'rtc-media-stream';
             }
 
-            static get config() {
+            static get properties() {
                 return {
-                    properties: {
-                        // instigator: {
-                        //     type: Boolean,
-                        //     default: false
-                        // },
-
                         in: {
                             type: Object,
-                            observer: '_inChanged'
+                            observer: '_inChanged',
+                            value: null
                         },
                         out: {
                             type: Object,
                             notify: true
                         }
-                    }
                 };
             }
 
             connectedCallback() {
                 super.connectedCallback();
 
-                console.log('RtcMediaStream', this.instigator, this.parentNode._pc);
-                this._pc = this.parentNode._pc;
+                console.log('RtcMediaStream', this.in, this.parentNode._pc);
+                // this._pc = this.parentNode._pc;
+
+                if (this.in) {
+                    this.parentNode._pc.addStream(this.in);
+                }
                 // if (this.instigator) {
                 //     // create data channel and setup chat
                 //     // var channel = this._pc.createDataChannel("chat");
@@ -68,16 +66,19 @@
                     //     this.setupChat(channel);
                     // };
                     this.parentNode._pc.onaddstream = e => {
-                        console.log('-==-=-=-=-==--= anAddStream', this.parentNode.id, e)
+                        console.log('-==-=-=-=-==--= onAddStream', this.parentNode.id, e.stream)
                         // this.$.video.srcObject = e.stream;
-                        this.out = e.stream;
+                        // let stream = window.URL.createObjectURL(e.stream);
+                        // this.out = stream;
+                        this.dispatchEvent(new CustomEvent('addstream', {detail: e.stream}));
                     }
                 // }
             }
 
             _inChanged(newValue, oldValue) {
-                console.log('_inChanged', this.parentNode);
-                this.parentNode._pc.addStream(newValue);
+                console.log('--------------------------- _inChanged', newValue, this.parentNode._pc);
+                if (newValue && this.parentMode && this.parentMode._pc)
+                    this.parentNode._pc.addStream(newValue);
             }
         }
 

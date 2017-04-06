@@ -24,7 +24,7 @@
             <template>
                 <h3>PEER CONNECTION</h3>
                 <rtc-peer-connection id="peer" on-send="onSend">
-                    <rtc-media-stream in=[[_localStream]] out={{_remoteStream}}></rtc-media-stream>
+                    <rtc-media-stream in=[[_localStream]] on-addstream="onAddStream" out={{_remoteStream}}></rtc-media-stream>
                 </rtc-peer-connection>
             </template>
         </dom-if>
@@ -43,13 +43,40 @@
                 return "sample-app";
             }
 
+            static get properties() {
+                return {
+                    _localStream: {
+                        type: Object,
+                        observer: '_localStreamChanged'
+                    },
+                    _remoteStream: {
+                        type: Object,
+                        observer: '_remoteStreamChanged'
+                    }
+                }
+            }
+
             static get observers() {
-                return ['_xyzzy(foobar, _localStream)'];
+                return ['_xyzzy(foobar, _localStream)',
+                '_aaaaaa(_remoteStream)'];
             }
 
             // constructor() {
             //     super();
             // }
+
+            _localStreamChanged(nv, olv) {
+                console.log('_localStreamChanged')
+            }
+
+            _remoteStreamChanged(nv, ov) {
+                console.log('_remoteStreamChanged')
+            }
+
+            onAddStream(e) {
+                console.log('onAddStream', e)
+                this._remoteStream = e.detail;
+            }
 
             connectedCallback() {
                 super.connectedCallback();
@@ -58,7 +85,7 @@
                     audio: false,
                     video: true
                 }).then(stream => {
-                    this._localStream = stream;
+                    this.set('_localStream', stream);
 // console.log('========', this.foobar)
 //                     this._signalingChannel.send('got user media');
                 }).catch(function(e) {
@@ -75,20 +102,24 @@
             // }
 
             _xyzzy(foobar, localStream) {
-                console.log('_xyzzy', foobar, localStream)
+                // console.log('_xyzzy', foobar, localStream)
                 if (foobar && localStream) {
                     this.$.channel.send('got user media');
                 }
             }
 
+            _aaaaaa(remoteStream) {
+                console.log('_aaaaaa')
+            }
+
             onSend(e) {
-                console.log('onSend', e);
+                // console.log('onSend', e);
 
                 this.$.channel.send(e.detail);
             }
 
             onMessage(e) {
-                console.log('onMessage', e.detail);
+                // console.log('onMessage', e.detail);
                 if (e.detail === 'got user media') {
                     this.foobar = "waz here";
                     // maybeStart();
@@ -101,7 +132,7 @@
             }
 
             onJoined(e) {
-                console.log('onJoined', e.detail)
+                // console.log('onJoined', e.detail)
                 this.foobar = "haz catz";
             }
 
